@@ -56,12 +56,12 @@ def band_html(band: str) -> str:
 
 def chart_layout(fig, title: str, height: int = 320):
     fig.update_layout(
-        title=dict(text=title, font=dict(size=15)),
-        margin=dict(l=8, r=8, t=42, b=8),
+        title=dict(text=title, font=dict(size=15), x=0, xanchor="left"),
+        margin=dict(l=8, r=8, t=48, b=56),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Source Sans 3, sans-serif", color="#1c2430", size=13),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        legend=dict(orientation="h", yanchor="top", y=-0.22, x=0),
         height=height,
     )
     fig.update_xaxes(showgrid=False)
