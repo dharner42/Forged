@@ -10,17 +10,15 @@ A maintenance lead at a 20 to 500 person plant, including a defense supplier, st
 
 ## 0:20 Fleet readiness
 
-Open the Fleet page. Read the green / amber / red counts and the readiness percentage. Point at the morning trend and say it only shows days at or before the plant clock. The model never trained on September through December. Those months are the test.
+Open the Fleet page. Read the green / amber / red counts. Then read "This shift." Machine 19 is the highest priority and it is on the do-not-start list: comp4 is out of stock, and the only general technician is on swing, not on this day shift. Machines 61 and 77 are the ones this crew can start. Say that the roster and the stock are simulated, and that this plan does not change the score the backtest uses.
 
-## 0:50 Why the top machine is first
+## 0:50 Why machine 19 ranks first anyway
 
-Open the first row. On the machine page, read the reason in plain language: a hot sensor, how long since that component was replaced, and whether the simulated part is short. Then show the contribution bars. Those are the model's own feature contributions, not a second opinion from a language model.
+Open machine 19. Read the reason: vibration, a recent error, component age, and the missing part. Show the contribution bars. Those come from the tree model. Say the formula once: probability times production impact times 1.5 when the part is out of stock or below its reorder point. Then say the calibrated score on this file sits near 0% or 100%, so you still read the sensor reason before you dispatch.
 
-Say the formula once: probability times production impact times a parts factor of 1.5 when the part is out of stock or below its reorder point.
+## 1:30 Create the work order on a job you can start
 
-## 1:30 Create the work order, then close it
-
-Create a work order. A simulated technician is assigned by skill and by who already has the fewest open jobs. Go back to the queue, mark it repaired, and refresh. The machine drops. Two things happened: the replacement age went to zero, and a shop rule multiplies the queue score by 0.15 for 24 hours so a hot sensor trace does not send a second technician to a machine you just finished. The probability is still on the page. The backtest of the formula does not use that 24-hour rule.
+Create a work order on machine 61, not 19. E. Shah is on the day shift and has the hydraulics skill. Mark it repaired. The machine drops. The replacement is logged at the plant clock, and a shop rule multiplies the queue score by 0.15 for 24 hours. The probability is still on the page. The backtest of the formula does not use that rule, and it does not use the shift plan.
 
 ## 2:00 Parts
 

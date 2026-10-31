@@ -12,7 +12,9 @@ A maintenance manager or plant manager at a shop of about 20 to 500 people, incl
 
 ## Fleet, on the demo morning
 
-Monday 23 November 2015, 06:00. Three machines are red. Ninety-seven are green. The top row is machine 19: high vibration, a recent error5, comp4 last replaced 74 days ago, and the simulated comp4 part is out of stock. Priority is 7.50, which is `1.00 × impact 5 × parts factor 1.5`.
+Monday 23 November 2015, 06:00. Three machines are red. Ninety-seven are green. The top of the ranked list is machine 19: high vibration, a recent error5, comp4 last replaced 74 days ago, and the simulated comp4 part is out of stock. Priority is 7.50, which is `1.00 × impact 5 × parts factor 1.5`.
+
+The shift plan then says not to start that job. It is 06:00, the day shift. The only general technician is on swing, and comp4 is at zero on the shelf with a 21-day lead time. The jobs that can start are machine 61 with E. Shah (hydraulics, one part left) and machine 77 with A. Rivera (mechanical). The roster and the stock are simulated. The priority score itself is unchanged.
 
 ![Fleet readiness on the demo morning](docs/screenshots/01_fleet.png)
 
