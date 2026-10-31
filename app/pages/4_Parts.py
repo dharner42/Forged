@@ -13,7 +13,7 @@ from app import db  # noqa: E402
 from app.ui import chart_layout, header, inject  # noqa: E402
 from models.shift_plan import shift_name  # noqa: E402
 
-st.set_page_config(page_title="Forge — Parts", page_icon="⚙", layout="wide")
+st.set_page_config(page_title="Forged Machine Monitoring — Parts", page_icon="⚙", layout="wide")
 inject()
 
 

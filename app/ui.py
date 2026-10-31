@@ -1,4 +1,4 @@
-"""Shared layout for the Forge dashboard."""
+"""Shared layout for the Forged Machine Monitoring dashboard."""
 
 import pandas as pd
 import streamlit as st
@@ -10,7 +10,7 @@ html, body, [class*="css"] { font-family: "Source Sans 3", "Segoe UI", sans-seri
 .block-container { padding-top: 1.05rem; padding-bottom: 2.5rem; max-width: 1180px; }
 .forge-top { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end;
   border-bottom: 2px solid #16323f; padding-bottom: 10px; margin-bottom: 12px; }
-.forge-mark { font-weight: 700; letter-spacing: 0.16em; font-size: 0.74rem; color: #1f4e5f; margin: 0; }
+.forge-mark { font-weight: 700; letter-spacing: 0.08em; font-size: 0.74rem; color: #1f4e5f; margin: 0; }
 h1.forge-title { font-size: 1.65rem; line-height: 1.1; margin: 0; color: #16323f; font-weight: 700; }
 p.forge-sub { margin: 3px 0 0 0; color: #52616b; }
 .forge-clock { text-align: right; color: #16323f; }
@@ -36,7 +36,7 @@ def header(title: str, subtitle: str, clock_label: str) -> None:
         f"""
         <div class="forge-top">
           <div>
-            <p class="forge-mark">FORGE · MACHINE READINESS</p>
+            <p class="forge-mark">FORGED MACHINE MONITORING</p>
             <h1 class="forge-title">{title}</h1>
             <p class="forge-sub">{subtitle}</p>
           </div>

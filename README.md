@@ -1,6 +1,6 @@
-# Forge
+# Forged Machine Monitoring
 
-Forge is a machine-readiness desk for a maintenance lead at a small or mid-size US manufacturer. The shift starts with more machines than people. The screen answers three questions: which machines are likely to fail in the next 24 hours, which of those stops the most production, and whether the part is on the shelf.
+Forged Machine Monitoring is a machine-readiness desk for a maintenance lead at a small or mid-size US manufacturer. The shift starts with more machines than people. The screen answers three questions: which machines are likely to fail in the next 24 hours, which of those stops the most production, and whether the part is on the shelf.
 
 It is a portfolio project for that problem. The models are scikit-learn and XGBoost trained on three public datasets. Nothing in the scoring path calls a language model.
 

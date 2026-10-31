@@ -1,4 +1,4 @@
-# How to defend Forge
+# How to defend Forged Machine Monitoring
 
 This is the plain-language version of the design. Read it out loud once. The numbers below are from the training run recorded in `results/results.md`. If you retrain, read that file again and update the three numbers you memorize: the 24-hour F1, the remaining-life RMSE, and the AI4I F1.
 
@@ -6,7 +6,7 @@ You do not need to pretend you wrote every line. You do need to be able to open 
 
 ## The one-minute version
 
-A maintenance lead at a 20 to 500 person plant starts the shift with more machines than people. Forge ranks what to fix first. It uses a real failure model on a public machine dataset, then multiplies that risk by how much production the machine stops and by whether the part is on the shelf.
+A maintenance lead at a 20 to 500 person plant starts the shift with more machines than people. Forged Machine Monitoring ranks what to fix first. It uses a real failure model on a public machine dataset, then multiplies that risk by how much production the machine stops and by whether the part is on the shelf.
 
 Three models, no language model:
 

@@ -12,7 +12,7 @@ from app import db  # noqa: E402
 from app.ui import header, inject, render_shift_plan  # noqa: E402
 from models.shift_plan import plan_shift  # noqa: E402
 
-st.set_page_config(page_title="Forge — Work queue", page_icon="⚙", layout="wide")
+st.set_page_config(page_title="Forged Machine Monitoring — Work queue", page_icon="⚙", layout="wide")
 inject()
 
 

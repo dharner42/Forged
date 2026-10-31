@@ -1,4 +1,4 @@
--- Forge warehouse. DuckDB is the default so a clone does not need Docker.
+-- Forged Machine Monitoring warehouse. DuckDB is the default so a clone does not need Docker.
 -- line, production_impact, parts, and technicians are SIMULATED.
 
 CREATE TABLE machines (
