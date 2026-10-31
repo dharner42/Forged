@@ -9,7 +9,8 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from app import db  # noqa: E402
-from app.ui import header, inject  # noqa: E402
+from app.ui import header, inject, render_shift_plan  # noqa: E402
+from models.shift_plan import plan_shift  # noqa: E402
 
 st.set_page_config(page_title="Forge — Work queue", page_icon="⚙", layout="wide")
 inject()
@@ -31,6 +32,7 @@ def main() -> None:
         clock.strftime("%a %d %b %Y, %H:%M"),
     )
 
+    render_shift_plan(plan_shift(fleet, db.technicians(con), clock))
     orders = db.open_work_orders(con, clock)
     st.subheader(f"Open work orders ({len(orders)})")
     if orders.empty:

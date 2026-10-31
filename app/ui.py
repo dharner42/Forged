@@ -1,5 +1,6 @@
 """Shared layout for the Forge dashboard."""
 
+import pandas as pd
 import streamlit as st
 
 CSS = """
@@ -52,6 +53,52 @@ def header(title: str, subtitle: str, clock_label: str) -> None:
 
 def band_html(band: str) -> str:
     return f'<span class="pill {band}">{band.upper()}</span>'
+
+
+def render_shift_plan(plan) -> None:
+    """Who can start a job on this shift. Roster and stock are simulated."""
+    if plan.on_duty.empty:
+        duty = "no one"
+    else:
+        duty = ", ".join(f"{row.name} ({row.skill})" for row in plan.on_duty.itertuples(index=False))
+    st.markdown(f"**On duty, {plan.shift} shift (SIMULATED):** {duty}")
+    st.caption(
+        "Each person on duty can take one machine. A job waits when the part is at zero or nobody with that skill is here. "
+        "This does not change the priority score."
+    )
+    left, right = st.columns(2)
+    with left:
+        st.markdown("**Start this shift**")
+        if plan.work_now.empty:
+            st.info("Nothing in the red or amber band can be started with this crew and this stock.")
+        else:
+            show = plan.work_now.rename(
+                columns={
+                    "machine_id": "Machine",
+                    "predicted_component": "Component",
+                    "queue_score": "Queue",
+                    "technician_name": "Who (SIMULATED)",
+                    "note": "Note",
+                }
+            )
+            show["Queue"] = show["Queue"].map(lambda value: f"{value:.2f}")
+            st.dataframe(show, use_container_width=True, hide_index=True)
+    with right:
+        st.markdown("**Do not start**")
+        held = pd.concat([plan.blocked, plan.deferred], ignore_index=True)
+        if held.empty:
+            st.success("Every red and amber machine can be staffed and has a part.")
+        else:
+            show = held.rename(
+                columns={
+                    "machine_id": "Machine",
+                    "predicted_component": "Component",
+                    "queue_score": "Queue",
+                    "note": "Why",
+                }
+            )
+            show["Queue"] = show["Queue"].map(lambda value: f"{value:.2f}")
+            st.dataframe(show, use_container_width=True, hide_index=True)
 
 
 def chart_layout(fig, title: str, height: int = 320):

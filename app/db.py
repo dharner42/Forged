@@ -13,6 +13,7 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from config import DB_PATH, METRICS_PATH  # noqa: E402
+from models.shift_plan import shift_name  # noqa: E402
 from pipeline.seed_ops import pick_technician  # noqa: E402
 from pipeline.warehouse import connect, read_clock  # noqa: E402
 
@@ -213,6 +214,12 @@ def create_work_order(con, machine_id: int) -> str:
     tech_id = pick_technician(techs, open_counts, str(component))
     tech_name = techs.loc[techs.technician_id.eq(tech_id), "name"].iloc[0]
     skill = techs.loc[techs.technician_id.eq(tech_id), "skill"].iloc[0]
+    tech_shift = techs.loc[techs.technician_id.eq(tech_id), "shift"].iloc[0]
+    current_shift = shift_name(clock)
+    if tech_shift == current_shift:
+        shift_note = f" {tech_name} is on the {current_shift} shift."
+    else:
+        shift_note = f" {tech_name} works the {tech_shift} shift, not {current_shift}."
     next_id = int(con.execute("SELECT coalesce(max(work_order_id), 0) + 1 FROM work_orders").fetchone()[0])
     con.execute(
         """
@@ -225,7 +232,7 @@ def create_work_order(con, machine_id: int) -> str:
     )
     return (
         f"Opened work order {next_id} for machine {machine_id}, {component}, "
-        f"assigned to {tech_name} ({skill}). The roster is SIMULATED."
+        f"assigned to {tech_name} ({skill}).{shift_note} The roster is SIMULATED."
     )
 
 
