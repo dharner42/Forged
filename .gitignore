@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+.mypy_cache/
+*.pyc
+.streamlit/secrets.toml
+
+# Raw downloads and the local warehouse are rebuilt by the scripts.
+data/raw/
+data/features/
+data/*.duckdb
+data/*.duckdb.wal
+
+uploads/
+dist/
+*.egg-info/
+agent-tools/

@@ -1,0 +1,221 @@
+{
+  "generated_at": "2026-10-31 01:48 UTC",
+  "azure": {
+    "xgboost": {
+      "threshold": 1.0,
+      "precision": 0.9937817976257772,
+      "recall": 0.9924727135867519,
+      "f1": 0.9931268242161755,
+      "pr_auc": 0.9884578249816801,
+      "rows": 288700,
+      "positives": 5314,
+      "prevalence": 0.018406650502251473,
+      "predicted_positive_rate": 0.018382403879459646,
+      "mean_predicted": 0.018393485194584395,
+      "tp": 5274,
+      "fp": 33,
+      "fn": 40,
+      "tn": 283353,
+      "pr_auc_raw": 0.9977217118173066
+    },
+    "logistic": {
+      "threshold": 0.49166666666666664,
+      "precision": 0.7992876224398932,
+      "recall": 0.8445615355664283,
+      "f1": 0.8213011254460609,
+      "pr_auc": 0.8358217807558045,
+      "rows": 288700,
+      "positives": 5314,
+      "prevalence": 0.018406650502251473,
+      "predicted_positive_rate": 0.019449255282299967,
+      "mean_predicted": 0.017357403392241733,
+      "tp": 4488,
+      "fp": 1127,
+      "fn": 826,
+      "tn": 282259,
+      "pr_auc_raw": 0.8566986584008708
+    },
+    "component_macro_f1": 1.0,
+    "component_test_rows": 5314,
+    "quantiles": {
+      "p50": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 1.0
+    },
+    "red_at": 1.0,
+    "amber_at": 0.5,
+    "fit_end": "2015-08-01 00:00:00",
+    "test_start": "2015-09-01 00:00:00",
+    "label_cutoff": "2015-12-30 06:00:00"
+  },
+  "rul": {
+    "constant_columns": [
+      "op3",
+      "s1",
+      "s5",
+      "s10",
+      "s16",
+      "s18",
+      "s19"
+    ],
+    "varying_columns": [
+      "op1",
+      "op2",
+      "s2",
+      "s3",
+      "s4",
+      "s6",
+      "s7",
+      "s8",
+      "s9",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s15",
+      "s17",
+      "s20",
+      "s21"
+    ],
+    "winner": "xgboost",
+    "winner_params": {
+      "max_depth": 3,
+      "n_estimators": 150
+    },
+    "comparison": [
+      {
+        "model": "Linear regression",
+        "features": "raw sensors",
+        "cv_rmse": null,
+        "rmse_official": 21.904170619492408,
+        "rmse_piecewise": 20.586657047059017
+      },
+      {
+        "model": "Linear regression",
+        "features": "raw + rolling 5/10",
+        "cv_rmse": null,
+        "rmse_official": 21.555086461378263,
+        "rmse_piecewise": 20.50927750799657
+      },
+      {
+        "model": "Random forest",
+        "features": "raw + rolling 5/10",
+        "cv_rmse": 18.82379399904452,
+        "rmse_official": 20.128911201701758,
+        "rmse_piecewise": 19.231512072333125
+      },
+      {
+        "model": "XGBoost",
+        "features": "raw + rolling 5/10",
+        "cv_rmse": 18.635965665181477,
+        "rmse_official": 19.472505932645184,
+        "rmse_piecewise": 18.55242563248547
+      }
+    ],
+    "error_buckets": [
+      {
+        "bucket": "0\u201330 cycles left",
+        "engines": 25,
+        "rmse": 17.143822199877214
+      },
+      {
+        "bucket": "31\u201380",
+        "engines": 20,
+        "rmse": 24.287603465056623
+      },
+      {
+        "bucket": "81\u2013125",
+        "engines": 44,
+        "rmse": 17.017422394412137
+      },
+      {
+        "bucket": "more than 125",
+        "engines": 11,
+        "rmse": 23.413771860043028
+      }
+    ],
+    "n_train_rows": 20631,
+    "n_train_engines": 100,
+    "n_test_engines": 100,
+    "life_cycles": {
+      "min": 128,
+      "median": 199.0,
+      "max": 362
+    },
+    "wrong_where": "Error is larger when the official remaining life is still long (23.4 RMSE beyond 125 cycles versus 17.1 when fewer than 30 cycles remain). Training labels were capped at 125, so the model is not allowed to predict a long healthy life, and engines that fail much later pile up near that cap. It is most useful close to failure, which is also when a maintenance lead would act."
+  },
+  "ai4i": {
+    "rows": 10000,
+    "prevalence": 0.0339,
+    "null_accuracy": 0.9661,
+    "logistic_f1": 0.2793522267206478,
+    "xgboost_f1": 0.608,
+    "test_positives": 85,
+    "modes": {
+      "twf": {
+        "logistic_f1": 0.0859375,
+        "xgboost_f1": 0.07407407407407407,
+        "support_positive_test": 11,
+        "support_positive_train": 35,
+        "majority_class_accuracy": 0.9956
+      },
+      "hdf": {
+        "logistic_f1": 0.5,
+        "xgboost_f1": 0.9310344827586207,
+        "support_positive_test": 29,
+        "support_positive_train": 86,
+        "majority_class_accuracy": 0.9884
+      },
+      "pwf": {
+        "logistic_f1": 0.4948453608247423,
+        "xgboost_f1": 0.9411764705882353,
+        "support_positive_test": 24,
+        "support_positive_train": 71,
+        "majority_class_accuracy": 0.9904
+      },
+      "osf": {
+        "logistic_f1": 0.5853658536585366,
+        "xgboost_f1": 0.8846153846153846,
+        "support_positive_test": 24,
+        "support_positive_train": 74,
+        "majority_class_accuracy": 0.9904
+      }
+    },
+    "features": [
+      "air_temp_k",
+      "process_temp_k",
+      "rpm",
+      "torque_nm",
+      "tool_wear_min",
+      "power",
+      "temp_diff",
+      "type_M",
+      "type_H"
+    ],
+    "rnf_rows": 19,
+    "mode_counts": {
+      "twf": 46,
+      "hdf": 115,
+      "pwf": 95,
+      "osf": 98
+    }
+  },
+  "backtest": {
+    "mornings": 115,
+    "horizon_days": 7,
+    "priority_avg_hits": 2.4869565217391303,
+    "probability_avg_hits": 2.4869565217391303,
+    "oldest_avg_hits": 1.5043478260869565,
+    "random10_avg_hits": 1.2547826086956522,
+    "service_suppression": 0.15,
+    "ranked_by": "priority_score (the published formula, not the 24-hour service rule)",
+    "sentence": "On 115 mornings from September through late December, the priority formula's top 10 had an average of 2.49 machines that failed within 7 days, versus 1.50 for oldest-machine-first, 2.49 for failure probability alone, and 1.25 for a random 10 machines.",
+    "demo_as_of": "2015-11-23 06:00:00"
+  },
+  "bands": {
+    "red_at": 1.0,
+    "amber_at": 0.5
+  },
+  "demo_as_of": "2015-11-23 06:00:00"
+}
