@@ -35,6 +35,8 @@ The average predicted probability is 0.018, which matches the 1.8% failure rate.
 
 **Morning list.** On 115 mornings, the top 10 had on average **2.49** machines that failed within 7 days. Oldest-machine-first had **1.50**. A random 10 had **1.25**. Ranking by probability alone also scored 2.49, because on this file the probability is already 0 or 1, so the business weights rarely change who is in the top 10. They do change the order among the machines that are already red.
 
+**Dollars.** The rates in `cost_assumptions.py` price that gap at about **$546,638** over the 115 mornings versus oldest-first, and about **$685,474** versus random. One extra catch on the reference machine (impact 3, comp2, part in stock) is **$4,838**. Say that these are planning rates, not invoices, and that impact and stock are simulated. If you have just run `make train`, read the cost section of `results/results.md` again. That run prices the actual machines instead of the reference machine.
+
 ## What is real, and what you made up
 
 Real, in the sense of "published data, not invented in this repo":
@@ -64,11 +66,13 @@ AI4I is small, clean, and nasty in the way real maintenance data is nasty: almos
 
 ## The data model, in one pass
 
-Open `docs/schema.md` if you want the column map. The spoken version:
+Open `docs/ONTOLOGY.md` for the objects and the links, and `docs/schema.md` for the column map. The spoken version:
 
 A **machine** has a model and an age from the file, plus a simulated line and impact. It emits **sensor readings**. It logs **faults** (error codes) and **failures** (a component actually broke). **Maintenance events** are component replacements. Historical ones are marked scheduled because the file does not say otherwise. A repair you log in the app is unscheduled and names a technician.
 
-**Parts** and **technicians** are simulated. A **work order** is what you create from the queue. **Current scores** are the board at the plant clock. **Predictions** are the morning scores from September through December, used for the trend and the backtest.
+**Parts** and **technicians** are simulated. A **shift** is day, swing, or night, and a technician works one of them. **Inventory** is the stock position of a part. In this plant that is the same row as the component, because the file has one SKU per component. A **work order** is what you create from the queue. **Current scores** are the board at the plant clock. **Predictions** are the morning scores from September through December, used for the trend and the backtest.
+
+The code for those objects is `ontology/model.py`. A build fails if a failure names an unknown component, or a technician names an unknown shift.
 
 Two extra tables, `bench_ai4i` and `bench_cmapss_fd001`, hold the other datasets so you can query them. They are not pretended to be machines in this plant. FD002 through FD004 come down in the NASA zip and stay on disk. The model is FD001 only: one operating condition, one fault mode.
 
@@ -110,6 +114,8 @@ Worked example, which the tests lock in: probability 0.40, impact 5, part out of
 Same machine with the part in stock: `2.00`.
 
 This is not a fourth machine-learning model. It is a business weight. On the backtest it did not catch more failures than probability alone, because probability was already 0 or 1. That is a finding, not a failure of the demo. The weights still change which red machine is first when two machines are both about to fail and only one is out of stock. Machine 19 on the demo morning is that case: probability 1, impact 5, comp4 out of stock, priority 7.50.
+
+The cost model is the same kind of thing. `cost_assumptions.py` states downtime per hour by impact, planned and unplanned hours, labor, and a part price. Catching one more failure on a fixed-length list saves the unplanned stop and the wasted inspection, and pays a planned repair instead. Quote the dollars from `results/results.md`, then say the rates are replaceable and the stock is simulated.
 
 The queue then applies a shop rule the backtest does not use. If any component was replaced in the last 24 hours, the queue score is 15% of the formula (`× 0.15`). Marking a machine repaired writes that replacement at the plant clock, rescores, and the machine drops. The probability stays on the page. You are not hiding the model. You are not sending a second technician to a machine someone just finished. Say that distinction. If you blur it, a sharp interviewer will think you cooked the backtest.
 
@@ -178,6 +184,9 @@ Use one of these if they ask for a scar.
 
 | They open | You say |
 | --- | --- |
+| `docs/ONTOLOGY.md` | The objects and the links. Component and Inventory share one table on purpose. |
+| `ontology/model.py` | The same model in code. The pipeline checks it. |
+| `cost_assumptions.py` | The only place a dollar rate is set. |
 | `db/schema.sql` | The plant, the clock, the queue view. Simulated columns are called out. |
 | `pipeline/validate.py` | What makes a bad file fail before it hits the database. |
 | `pipeline/seed_ops.py` | The fake roster and the fake stock. Seed 42 for impact. |
@@ -204,4 +213,4 @@ Use one of these if they ask for a scar.
 
 **What would a maintenance manager not trust?** The simulated stock, the simulated names, and a 0.99 that came from a tutorial simulator. The fix is their data in the same tables.
 
-**What is next?** A real historian and a real CMMS mapped onto this schema, the seeded stock deleted, and the 24-hour model refit with a time split on their failures. The weights stay a starting point until a lead tells you what "impact" means in their plant.
+**What is next?** One supplier, one line, 90 days. Days 1–30 are data quality, not a model: map their historian and CMMS onto the ontology, delete the seeded stock and the seeded impact, and replace the rates in `cost_assumptions.py`. Days 31–60 the list is visible and the crew still works their own way. Days 61–90 they use it for one shift. If they have fewer than about 30 failures, do not show a probability. The README section "Limitations and pilot plan" is the longer version. The weights stay a starting point until a lead tells you what "impact" means in their plant.

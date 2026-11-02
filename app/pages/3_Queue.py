@@ -9,7 +9,8 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from app import db  # noqa: E402
-from app.ui import header, inject, render_shift_plan  # noqa: E402
+from app.ui import header, inject, render_shift_plan, sample_banner  # noqa: E402
+from models.costs import savings_from_hit_rates  # noqa: E402
 from models.shift_plan import plan_shift  # noqa: E402
 
 st.set_page_config(page_title="Forged Machine Monitoring — Work queue", page_icon="⚙", layout="wide")
@@ -31,8 +32,17 @@ def main() -> None:
         "Ranked by queue score. A repair in the last 24 hours moves a machine down without erasing its probability.",
         clock.strftime("%a %d %b %Y, %H:%M"),
     )
+    sample_banner(db.is_sample_plant(con))
 
     render_shift_plan(plan_shift(fleet, db.technicians(con), clock))
+    report = db.metrics()
+    if report and report.get("backtest"):
+        savings = report["backtest"].get("savings") or savings_from_hit_rates(report["backtest"])
+        st.caption(
+            f"Planning-rate estimate for this ranking versus oldest-first: "
+            f"${savings['usd_window_vs_oldest']:,.0f} over the {savings['mornings']}-morning backtest. "
+            f"Versus a random 10: ${savings['usd_window_vs_random']:,.0f}. Rates are in cost_assumptions.py."
+        )
     orders = db.open_work_orders(con, clock)
     st.subheader(f"Open work orders ({len(orders)})")
     if orders.empty:

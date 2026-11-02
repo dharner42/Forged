@@ -11,9 +11,11 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from app import db  # noqa: E402
-from app.ui import chart_layout, header, inject, render_shift_plan  # noqa: E402
+from app.ui import chart_layout, header, inject, render_shift_plan, sample_banner  # noqa: E402
+from models.costs import savings_from_hit_rates  # noqa: E402
 from models.shift_plan import plan_shift  # noqa: E402
 from config import CLOCK_MAX, CLOCK_MIN  # noqa: E402
+from pipeline.sample_plant import SAMPLE_CLOCK, sample_history_start  # noqa: E402
 
 st.set_page_config(page_title="Forged Machine Monitoring — Fleet", page_icon="⚙", layout="wide")
 inject()
@@ -53,6 +55,8 @@ def main() -> None:
         "What to fix first on this shift. Scores use only readings at or before the plant clock.",
         _clock_label(clock),
     )
+    sample = db.is_sample_plant(con)
+    sample_banner(sample)
 
     if fleet.empty:
         st.warning("Machines are loaded, but there is no score snapshot. Run `make train`.")
@@ -108,6 +112,19 @@ def main() -> None:
         if report and report.get("backtest"):
             st.markdown(report["backtest"]["sentence"])
 
+    report = db.metrics()
+    if report and report.get("backtest"):
+        savings = report["backtest"].get("savings") or savings_from_hit_rates(report["backtest"])
+        st.subheader("What the list is worth, at the planning rates")
+        s1, s2, s3 = st.columns(3)
+        if "usd_per_extra_catch" in savings:
+            s1.metric("Per extra catch, reference machine", f"${savings['usd_per_extra_catch']:,.0f}")
+        else:
+            s1.metric("Priority-list cost, test window", f"${savings['priority_cost_window']:,.0f}")
+        s2.metric("Vs oldest-first, test window", f"${savings['usd_window_vs_oldest']:,.0f}")
+        s3.metric("Vs random 10, test window", f"${savings['usd_window_vs_random']:,.0f}")
+        st.caption(savings["note"])
+
     st.subheader("Fix these first")
     show = fleet.head(8).copy()
     show["P(fail 24h)"] = (show["p_fail_24h"] * 100).map(lambda v: f"{v:.1f}%")
@@ -159,16 +176,26 @@ def main() -> None:
         st.success(st.session_state.pop("flash"))
 
     with st.expander("Move the plant clock"):
-        st.markdown(
-            "The replay does not insert rows one hour at a time. The full year is already in the warehouse. "
-            "Moving the clock hides the future and rescores every machine from readings up to that hour."
-        )
+        if sample:
+            min_day = sample_history_start().date()
+            max_day = SAMPLE_CLOCK.date()
+            st.markdown(
+                "This is the bundled sample. Moving the clock loads the latest stored morning at or before "
+                "that hour. It does not rerun the Azure model, and a repair you just logged is reset to the stored morning."
+            )
+        else:
+            min_day = CLOCK_MIN.date()
+            max_day = CLOCK_MAX.date()
+            st.markdown(
+                "The replay does not insert rows one hour at a time. The full year is already in the warehouse. "
+                "Moving the clock hides the future and rescores every machine from readings up to that hour."
+            )
         with st.form("clock"):
             day = st.date_input(
                 "Date",
                 value=clock.date(),
-                min_value=CLOCK_MIN.date(),
-                max_value=CLOCK_MAX.date(),
+                min_value=min_day,
+                max_value=max_day,
             )
             hour = st.selectbox("Hour", list(range(24)), index=int(clock.hour))
             submitted = st.form_submit_button("Move plant clock")

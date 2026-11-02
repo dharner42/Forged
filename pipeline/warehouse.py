@@ -17,6 +17,7 @@ DROP_VIEWS = (
     "faults_live",
     "failures_live",
     "maintenance_live",
+    "inventory",
 )
 DROP_TABLES = (
     "current_scores",
@@ -29,6 +30,7 @@ DROP_TABLES = (
     "maintenance_events",
     "parts",
     "technicians",
+    "shifts",
     "machines",
     "bench_ai4i",
     "bench_cmapss_fd001",

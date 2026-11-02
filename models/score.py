@@ -13,6 +13,12 @@ from config import LABEL_CUTOFF, SERVICE_SUPPRESSION, TEST_START
 from models.azure_risk import design_matrix, load_bundle, predict_calibrated, predict_component
 from models.features import PHRASES, azure_feature_frame
 from models.plots import AMBER, NAVY, apply_style, save
+from models.costs import (
+    cost_of_selection,
+    expected_random_list_cost,
+    savings_from_hit_rates,
+    summarize_machine_costs,
+)
 from models.priority import assemble_queue
 from pipeline.warehouse import connect, insert_df, write_clock
 
@@ -87,8 +93,12 @@ def _prediction_frame(assembled: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def backtest(daily: pd.DataFrame, failures: pd.DataFrame, machines: pd.DataFrame) -> dict:
-    """How often the morning top 10 fails within 7 days, versus two naive lists."""
+def backtest(daily: pd.DataFrame, failures: pd.DataFrame, machines: pd.DataFrame, parts: pd.DataFrame | None = None) -> dict:
+    """How often the morning top 10 fails within 7 days, versus two naive lists.
+
+    When ``parts`` is provided, the same mornings are priced with the rates in
+    ``cost_assumptions.py``. The hit counts do not change.
+    """
     daily = daily.copy()
     daily["ts"] = pd.to_datetime(daily["ts"])
     failures = failures.copy()
@@ -107,6 +117,10 @@ def backtest(daily: pd.DataFrame, failures: pd.DataFrame, machines: pd.DataFrame
     probability_hits = []
     oldest_hits = []
     random_hits = []
+    priority_costs = []
+    oldest_costs = []
+    random_costs = []
+    n_machines = int(machines["machine_id"].nunique()) if len(machines) else 0
     for day in days:
         group = daily[daily["ts"] == day]
         window = failures[(failures["ts"] > day) & (failures["ts"] <= day + horizon)]
@@ -121,6 +135,12 @@ def backtest(daily: pd.DataFrame, failures: pd.DataFrame, machines: pd.DataFrame
         probability_hits.append(hits(by_probability["machine_id"]))
         oldest_hits.append(hits(oldest))
         random_hits.append(10.0 * len(failed) / 100.0)
+        if parts is not None:
+            priority_costs.append(cost_of_selection(by_priority["machine_id"], window, machines, parts))
+            oldest_costs.append(cost_of_selection(oldest, window, machines, parts))
+            random_costs.append(
+                expected_random_list_cost(window, machines, parts, n_machines=n_machines, list_size=10)
+            )
 
     def avg(values) -> float:
         return float(np.mean(values)) if values else 0.0
@@ -135,6 +155,10 @@ def backtest(daily: pd.DataFrame, failures: pd.DataFrame, machines: pd.DataFrame
         "service_suppression": SERVICE_SUPPRESSION,
         "ranked_by": "priority_score (the published formula, not the 24-hour service rule)",
     }
+    if parts is not None and priority_costs:
+        metrics["savings"] = summarize_machine_costs(priority_costs, oldest_costs, random_costs)
+    else:
+        metrics["savings"] = savings_from_hit_rates(metrics)
     metrics["sentence"] = (
         f"On {metrics['mornings']} mornings from September through late December, "
         f"the priority formula's top 10 had an average of {metrics['priority_avg_hits']:.2f} machines "
@@ -201,7 +225,7 @@ def publish_scores(trained: dict) -> dict:
         trained["parts"],
         with_contribs=False,
     )
-    report = backtest(mornings, trained["failures"], trained["machines"])
+    report = backtest(mornings, trained["failures"], trained["machines"], trained["parts"])
     demo_as_of = choose_demo_morning(mornings)
     con = connect()
     try:

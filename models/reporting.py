@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from config import METRICS_PATH
+from models.costs import savings_from_hit_rates, savings_section
 
 
 def _plain(value):
@@ -34,6 +35,8 @@ def _num(value: float, digits: int = 3) -> str:
 
 
 def write_results(rul: dict, ai4i: dict, azure: dict, backtest: dict) -> None:
+    backtest = dict(backtest)
+    backtest.setdefault("savings", savings_from_hit_rates(backtest))
     payload = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "azure": {key: value for key, value in azure.items() if key not in {"frame", "machines", "parts", "failures", "bundle"}},
@@ -129,6 +132,10 @@ RNF has {payload['ai4i']['rnf_rows']} rows. The dataset defines it as a random f
 {back['sentence']}
 
 The ranking in that sentence is the published formula, priority = probability × impact × parts factor. It does not use the 24-hour "just serviced" queue adjustment. Parts and impact are simulated, so this is a test of the weighting scheme on the synthetic plant, not of a real storeroom.
+
+## What the priority list is worth, in the planning rates
+
+{savings_section(back['savings'])}
 
 Demo plant clock: {payload['demo_as_of']}. That morning is the November Monday whose priority scores are most spread out, and at least one machine is out of the green band when such a Monday exists. It was not chosen by looking at which machine failed later.
 """

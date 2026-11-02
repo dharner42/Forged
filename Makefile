@@ -1,7 +1,7 @@
 PYTHON := $(shell if [ -x .venv/bin/python ]; then echo .venv/bin/python; else echo python3; fi)
 PORT ?= 8741
 
-.PHONY: install download pipeline train test dashboard check notebook diagrams all
+.PHONY: install download pipeline train test lint dashboard check notebook diagrams all
 
 install:
 	$(PYTHON) -m pip install -r requirements.txt
@@ -17,6 +17,9 @@ train:
 
 test:
 	$(PYTHON) -m pytest
+
+lint:
+	$(PYTHON) -m ruff check .
 
 dashboard:
 	$(PYTHON) -m streamlit run app/Home.py --server.port $(PORT) --server.address 0.0.0.0 --server.headless true

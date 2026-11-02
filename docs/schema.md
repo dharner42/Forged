@@ -15,6 +15,8 @@ erDiagram
     machines ||--o{ predictions : history
     technicians ||--o{ work_orders : assigned
     technicians ||--o{ maintenance_events : performed
+    shifts ||--o{ technicians : staffs
+    parts ||--|| inventory : "one bin per component"
     parts ||--o{ work_orders : "component, not a formal FK"
 ```
 
@@ -28,11 +30,15 @@ erDiagram
 | `failures` | `failure_id`, `machine_id`, `ts`, `component` | Azure `PdM_failures.csv` |
 | `maintenance_events` | `event_id`, `machine_id`, `ts`, `component`, `type`, `technician_id` | Azure `PdM_maint.csv`, plus repairs the dashboard logs |
 | `parts` | `part_id`, `component`, `on_hand`, `reorder_point`, `lead_time_days`, `simulated` | Seeded. SIMULATED |
-| `technicians` | `technician_id`, `name`, `skill`, `shift`, `simulated` | Seeded. SIMULATED |
+| `inventory` | view of `parts`: `inventory_id`, `component`, `on_hand`, `reorder_point`, `lead_time_days`, `simulated` | The stock position. SIMULATED |
+| `shifts` | `shift_id`, `name`, `start_hour`, `end_hour`, `simulated` | Seeded. SIMULATED. Day, swing, night |
+| `technicians` | `technician_id`, `name`, `skill`, `shift`, `simulated` | Seeded. SIMULATED. `shift` references `shifts` |
 | `work_orders` | `work_order_id`, `machine_id`, `component`, `status`, `priority_score`, `opened_ts`, `closed_ts`, `technician_id`, `reason` | Created in the dashboard |
 | `current_scores` | one row per machine at the plant clock | Model output |
 | `predictions` | one row per machine per test-period morning | Model output, used for the trend and the backtest |
 | `plant_clock` | `as_of` | The replay cursor |
+
+The object names (Machine, Component, Sensor reading, Failure, Work order, Technician, Shift, Inventory) and the links between them are written out in [ONTOLOGY.md](ONTOLOGY.md). `ontology/model.py` is what the pipeline checks after a build.
 
 `current_scores` and `predictions` carry `p_fail_24h`, `predicted_component`, `parts_factor`, `priority_score`, `queue_score`, `band`, and `top_reason`. `queue_score` equals `priority_score` unless a component was replaced in the last 24 hours, in which case it is 15% of the formula. The backtest ranks by `priority_score` only.
 

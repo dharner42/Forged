@@ -10,7 +10,7 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from app import db  # noqa: E402
-from app.ui import chart_layout, header, inject  # noqa: E402
+from app.ui import chart_layout, header, inject, sample_banner  # noqa: E402
 from models.shift_plan import shift_name  # noqa: E402
 
 st.set_page_config(page_title="Forged Machine Monitoring — Parts", page_icon="⚙", layout="wide")
@@ -28,6 +28,7 @@ def main() -> None:
         "Every number on this page is SIMULATED. The public datasets have no storeroom and no roster.",
         clock.strftime("%a %d %b %Y, %H:%M"),
     )
+    sample_banner(db.is_sample_plant(con))
     st.markdown(
         '<span class="pill sim">SIMULATED</span> '
         "Stock, reorder points, lead times, technician names, skills, and shifts were generated for the demo. "

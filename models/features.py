@@ -12,10 +12,12 @@ import numpy as np
 import pandas as pd
 
 from config import FAILURE_HORIZON_HOURS
+from ontology.model import COMPONENTS as _ONTOLOGY_COMPONENTS
 
 SENSOR_COLS = ["volt", "rotate", "pressure", "vibration"]
 ERROR_CODES = [f"error{i}" for i in range(1, 6)]
-COMPONENTS = [f"comp{i}" for i in range(1, 5)]
+# Same component ids as the ontology. The feature columns are hours_since_<component>.
+COMPONENTS = list(_ONTOLOGY_COMPONENTS)
 MODEL_LEVELS = ["model1", "model2", "model3", "model4"]
 WINDOW = 24
 MIN_PERIODS = 6

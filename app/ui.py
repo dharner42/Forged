@@ -51,6 +51,17 @@ def header(title: str, subtitle: str, clock_label: str) -> None:
     )
 
 
+def sample_banner(is_sample: bool) -> None:
+    if not is_sample:
+        return
+    st.info(
+        "Bundled sample plant: 12 machines and authored scores, so this app opens without downloading "
+        "Azure, NASA, or AI4I. The RMSE, the 2.49 backtest, and the dollar figures are from results/ "
+        "on the full files, not from these 12 machines. Machine 4 is the worked example "
+        "(probability 1, impact 5, comp4 out of stock, priority 7.50)."
+    )
+
+
 def band_html(band: str) -> str:
     return f'<span class="pill {band}">{band.upper()}</span>'
 
