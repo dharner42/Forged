@@ -8,7 +8,8 @@ import pandas as pd
 
 from config import DB_PATH, EXPECTED_COUNTS, RAW_DIR
 from pipeline.load import load_ai4i, load_azure, load_cmapss_fd001, with_ids
-from pipeline.seed_ops import assign_machine_ops, parts_frame, technicians_frame
+from ontology.model import assert_warehouse_matches_ontology
+from pipeline.seed_ops import assign_machine_ops, parts_frame, shifts_frame, technicians_frame
 from pipeline.validate import require_valid
 from pipeline.warehouse import connect, insert_df, reset_schema, write_clock
 
@@ -38,6 +39,12 @@ def build_database(
             "machines",
             frames["machines"],
             ["machine_id", "model", "age_years", "line", "production_impact"],
+        )
+        insert_df(
+            con,
+            "shifts",
+            shifts_frame(),
+            ["shift_id", "name", "start_hour", "end_hour", "simulated"],
         )
         insert_df(con, "technicians", technicians_frame(), ["technician_id", "name", "skill", "shift", "simulated"])
         insert_df(
@@ -70,6 +77,7 @@ def build_database(
             pd.Timestamp("2015-11-16 06:00:00"),
             "Placeholder clock. make train moves it to the demo morning.",
         )
+        assert_warehouse_matches_ontology(con)
         counts = {
             table: int(con.execute(f"SELECT count(*) FROM {table}").fetchone()[0])
             for table in (

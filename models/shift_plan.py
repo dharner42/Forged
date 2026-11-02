@@ -11,17 +11,13 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from ontology.model import shift_id_for_timestamp
 from pipeline.seed_ops import COMPONENT_SKILL
 
 
 def shift_name(as_of) -> str:
-    """Day 06:00–14:00, swing 14:00–22:00, night otherwise. Boundaries are simulated."""
-    hour = pd.Timestamp(as_of).hour
-    if 6 <= hour < 14:
-        return "day"
-    if 14 <= hour < 22:
-        return "swing"
-    return "night"
+    """Day 06:00–14:00, swing 14:00–22:00, night otherwise. Hours live on the Shift object."""
+    return shift_id_for_timestamp(as_of)
 
 
 @dataclass

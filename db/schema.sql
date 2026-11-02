@@ -36,12 +36,22 @@ CREATE TABLE failures (
     FOREIGN KEY (machine_id) REFERENCES machines(machine_id)
 );
 
+-- Shifts are SIMULATED shop hours. Technicians point at shift_id.
+CREATE TABLE shifts (
+    shift_id VARCHAR PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    start_hour INTEGER NOT NULL,
+    end_hour INTEGER NOT NULL,
+    simulated BOOLEAN NOT NULL
+);
+
 CREATE TABLE technicians (
     technician_id INTEGER PRIMARY KEY,
     name VARCHAR NOT NULL,
     skill VARCHAR NOT NULL,
     shift VARCHAR NOT NULL,
-    simulated BOOLEAN NOT NULL
+    simulated BOOLEAN NOT NULL,
+    FOREIGN KEY (shift) REFERENCES shifts(shift_id)
 );
 
 CREATE TABLE parts (
@@ -197,3 +207,15 @@ CREATE VIEW maintenance_live AS
 SELECT m.*
 FROM maintenance_events m
 WHERE m.ts <= (SELECT as_of FROM plant_clock WHERE id = 1);
+
+-- One stock position per component. The object model calls this Inventory.
+-- The parts table is still the row you update when a repair consumes a unit.
+CREATE VIEW inventory AS
+SELECT
+    part_id AS inventory_id,
+    component,
+    on_hand,
+    reorder_point,
+    lead_time_days,
+    simulated
+FROM parts;

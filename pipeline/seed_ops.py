@@ -10,6 +10,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from ontology.model import COMPONENT_SKILL, SHIFTS
+
 LINES = ("Machining", "Assembly", "Test", "Finish")
 
 # One stocked part per Azure component. comp2 is below its reorder point and
@@ -32,12 +34,21 @@ TECHNICIANS = (
     {"technician_id": 6, "name": "F. Alvarez", "skill": "general", "shift": "swing"},
 )
 
-COMPONENT_SKILL = {
-    "comp1": "mechanical",
-    "comp2": "hydraulics",
-    "comp3": "electrical",
-    "comp4": "general",
-}
+
+def shifts_frame() -> pd.DataFrame:
+    """One row per Shift object. Hours come from the ontology, not a second copy."""
+    return pd.DataFrame(
+        [
+            {
+                "shift_id": shift.shift_id,
+                "name": shift.name,
+                "start_hour": shift.start_hour,
+                "end_hour": shift.end_hour,
+                "simulated": True,
+            }
+            for shift in SHIFTS
+        ]
+    )
 
 
 def assign_machine_ops(machines: pd.DataFrame, seed: int = 42) -> pd.DataFrame:
