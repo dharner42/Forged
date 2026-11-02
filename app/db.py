@@ -20,10 +20,23 @@ from pipeline.warehouse import connect, read_clock  # noqa: E402
 
 def connection():
     if not DB_PATH.exists():
+        from pipeline.sample_plant import ensure_demo_warehouse
+
+        ensure_demo_warehouse(DB_PATH)
+    if not DB_PATH.exists():
         return None
     if "forge_con" not in st.session_state:
         st.session_state["forge_con"] = connect(DB_PATH)
     return st.session_state["forge_con"]
+
+
+def is_sample_plant(con) -> bool:
+    row = con.execute("SELECT note FROM plant_clock WHERE id = 1").fetchone()
+    if row is None:
+        return False
+    from pipeline.sample_plant import is_sample_note
+
+    return is_sample_note(row[0])
 
 
 def metrics() -> dict | None:
@@ -276,6 +289,15 @@ def mark_repaired(con, work_order_id: int) -> str:
     except Exception:
         con.execute("ROLLBACK")
         raise
+    if is_sample_plant(con):
+        from pipeline.sample_plant import suppress_after_repair
+
+        suppress_after_repair(con, int(machine_id))
+        return (
+            f"Closed work order {work_order_id}. Logged an unscheduled {component} replacement "
+            f"at the plant clock. {stock_note} This is the bundled sample, so the Azure model was "
+            f"not rerun. The queue score is 15% of the formula for 24 hours."
+        )
     from models.score import score_current
 
     score_current(clock, con=con, note="Rescored after a repair logged at the plant clock.")
@@ -287,6 +309,11 @@ def mark_repaired(con, work_order_id: int) -> str:
 
 
 def move_clock(con, as_of: pd.Timestamp) -> None:
+    if is_sample_plant(con):
+        from pipeline.sample_plant import move_sample_clock
+
+        move_sample_clock(con, as_of)
+        return
     from models.score import score_current
 
     score_current(as_of, con=con, note="Plant clock moved from the dashboard.")

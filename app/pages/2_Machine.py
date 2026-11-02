@@ -13,7 +13,7 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from app import db  # noqa: E402
-from app.ui import band_html, chart_layout, header, inject  # noqa: E402
+from app.ui import band_html, chart_layout, header, inject, sample_banner  # noqa: E402
 from models.shift_plan import plan_shift  # noqa: E402
 
 st.set_page_config(page_title="Forged Machine Monitoring — Machine", page_icon="⚙", layout="wide")
@@ -31,6 +31,8 @@ def main() -> None:
         return
     clock = db.plant_clock(con)
     header("Machine", "Sensors, the factors behind the risk, and the part it would need.", clock.strftime("%a %d %b %Y, %H:%M"))
+    sample = db.is_sample_plant(con)
+    sample_banner(sample)
 
     ids = fleet["machine_id"].astype(int).tolist()
     default = int(st.session_state.get("machine_id", ids[0]))
@@ -58,7 +60,13 @@ def main() -> None:
                 "Calibrated scores on this dataset sit near 0% or 100%. "
                 "Check the sensor reason before you dispatch. A real plant will not be this sharp."
             )
-        st.caption("Impact, the parts factor, and the technician roster are SIMULATED. The probability is the model.")
+        if sample:
+            st.caption(
+                "Impact, the parts factor, and the technician roster are SIMULATED. "
+                "On this bundled sample the probability is authored so the screen can rank machines. It is not the Azure model."
+            )
+        else:
+            st.caption("Impact, the parts factor, and the technician roster are SIMULATED. The probability is the model.")
         contribs = []
         if isinstance(row.contrib_json, str) and row.contrib_json:
             contribs = json.loads(row.contrib_json)
