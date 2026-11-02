@@ -15,7 +15,7 @@ from pipeline.warehouse import connect, read_clock
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Move the Forge plant clock and rescore.")
+    parser = argparse.ArgumentParser(description="Move the Forged Machine Monitoring plant clock and rescore.")
     parser.add_argument("--as-of", help="Timestamp, for example 2015-11-16 06:00")
     parser.add_argument("--advance-hours", type=int, help="Move the current clock forward")
     args = parser.parse_args()

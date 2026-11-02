@@ -14,8 +14,9 @@ install(Path(__file__))
 
 from app import db  # noqa: E402
 from app.ui import band_html, chart_layout, header, inject  # noqa: E402
+from models.shift_plan import plan_shift  # noqa: E402
 
-st.set_page_config(page_title="Forge — Machine", page_icon="⚙", layout="wide")
+st.set_page_config(page_title="Forged Machine Monitoring — Machine", page_icon="⚙", layout="wide")
 inject()
 
 
@@ -48,6 +49,15 @@ def main() -> None:
         )
         st.markdown(f"Queue score **{row.queue_score:.2f}**")
         st.markdown(row.top_reason)
+        shift = plan_shift(fleet, db.technicians(con), clock)
+        shift_note = shift.note_for(int(machine_id))
+        if shift_note:
+            st.info(shift_note)
+        if float(row.p_fail_24h) >= 0.99 or float(row.p_fail_24h) <= 0.01:
+            st.caption(
+                "Calibrated scores on this dataset sit near 0% or 100%. "
+                "Check the sensor reason before you dispatch. A real plant will not be this sharp."
+            )
         st.caption("Impact, the parts factor, and the technician roster are SIMULATED. The probability is the model.")
         contribs = []
         if isinstance(row.contrib_json, str) and row.contrib_json:

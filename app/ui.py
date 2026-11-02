@@ -1,5 +1,6 @@
-"""Shared layout for the Forge dashboard."""
+"""Shared layout for the Forged Machine Monitoring dashboard."""
 
+import pandas as pd
 import streamlit as st
 
 CSS = """
@@ -9,7 +10,7 @@ html, body, [class*="css"] { font-family: "Source Sans 3", "Segoe UI", sans-seri
 .block-container { padding-top: 1.05rem; padding-bottom: 2.5rem; max-width: 1180px; }
 .forge-top { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end;
   border-bottom: 2px solid #16323f; padding-bottom: 10px; margin-bottom: 12px; }
-.forge-mark { font-weight: 700; letter-spacing: 0.16em; font-size: 0.74rem; color: #1f4e5f; margin: 0; }
+.forge-mark { font-weight: 700; letter-spacing: 0.08em; font-size: 0.74rem; color: #1f4e5f; margin: 0; }
 h1.forge-title { font-size: 1.65rem; line-height: 1.1; margin: 0; color: #16323f; font-weight: 700; }
 p.forge-sub { margin: 3px 0 0 0; color: #52616b; }
 .forge-clock { text-align: right; color: #16323f; }
@@ -35,7 +36,7 @@ def header(title: str, subtitle: str, clock_label: str) -> None:
         f"""
         <div class="forge-top">
           <div>
-            <p class="forge-mark">FORGE · MACHINE READINESS</p>
+            <p class="forge-mark">FORGED MACHINE MONITORING</p>
             <h1 class="forge-title">{title}</h1>
             <p class="forge-sub">{subtitle}</p>
           </div>
@@ -52,6 +53,52 @@ def header(title: str, subtitle: str, clock_label: str) -> None:
 
 def band_html(band: str) -> str:
     return f'<span class="pill {band}">{band.upper()}</span>'
+
+
+def render_shift_plan(plan) -> None:
+    """Who can start a job on this shift. Roster and stock are simulated."""
+    if plan.on_duty.empty:
+        duty = "no one"
+    else:
+        duty = ", ".join(f"{row.name} ({row.skill})" for row in plan.on_duty.itertuples(index=False))
+    st.markdown(f"**On duty, {plan.shift} shift (SIMULATED):** {duty}")
+    st.caption(
+        "Each person on duty can take one machine. A job waits when the part is at zero or nobody with that skill is here. "
+        "This does not change the priority score."
+    )
+    left, right = st.columns(2)
+    with left:
+        st.markdown("**Start this shift**")
+        if plan.work_now.empty:
+            st.info("Nothing in the red or amber band can be started with this crew and this stock.")
+        else:
+            show = plan.work_now.rename(
+                columns={
+                    "machine_id": "Machine",
+                    "predicted_component": "Component",
+                    "queue_score": "Queue",
+                    "technician_name": "Who (SIMULATED)",
+                    "note": "Note",
+                }
+            )
+            show["Queue"] = show["Queue"].map(lambda value: f"{value:.2f}")
+            st.dataframe(show, use_container_width=True, hide_index=True)
+    with right:
+        st.markdown("**Do not start**")
+        held = pd.concat([plan.blocked, plan.deferred], ignore_index=True)
+        if held.empty:
+            st.success("Every red and amber machine can be staffed and has a part.")
+        else:
+            show = held.rename(
+                columns={
+                    "machine_id": "Machine",
+                    "predicted_component": "Component",
+                    "queue_score": "Queue",
+                    "note": "Why",
+                }
+            )
+            show["Queue"] = show["Queue"].map(lambda value: f"{value:.2f}")
+            st.dataframe(show, use_container_width=True, hide_index=True)
 
 
 def chart_layout(fig, title: str, height: int = 320):

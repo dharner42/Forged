@@ -11,8 +11,9 @@ install(Path(__file__))
 
 from app import db  # noqa: E402
 from app.ui import chart_layout, header, inject  # noqa: E402
+from models.shift_plan import shift_name  # noqa: E402
 
-st.set_page_config(page_title="Forge — Parts", page_icon="⚙", layout="wide")
+st.set_page_config(page_title="Forged Machine Monitoring — Parts", page_icon="⚙", layout="wide")
 inject()
 
 
@@ -93,8 +94,11 @@ def main() -> None:
     )
 
     st.subheader("Technicians")
-    st.caption("Names, skills, and shifts are SIMULATED. A new work order picks the matching skill with the fewest open jobs.")
+    st.caption("Names, skills, and shifts are SIMULATED. A new work order still picks by skill. The shift plan only starts jobs the people on duty can do.")
     techs = db.technicians(con)
+    current_shift = shift_name(clock)
+    techs = techs.copy()
+    techs["on_shift"] = techs["shift"].eq(current_shift).map({True: "yes", False: ""})
     st.dataframe(
         techs.rename(
             columns={
@@ -102,9 +106,10 @@ def main() -> None:
                 "name": "Name (SIMULATED)",
                 "skill": "Skill (SIMULATED)",
                 "shift": "Shift (SIMULATED)",
+                "on_shift": f"On {current_shift} shift",
                 "open_work_orders": "Open work orders",
             }
-        )[["Id", "Name (SIMULATED)", "Skill (SIMULATED)", "Shift (SIMULATED)", "Open work orders"]],
+        )[["Id", "Name (SIMULATED)", "Skill (SIMULATED)", "Shift (SIMULATED)", f"On {current_shift} shift", "Open work orders"]],
         use_container_width=True,
         hide_index=True,
     )

@@ -13,4 +13,4 @@ def install(start: str | Path) -> Path:
             if root not in sys.path:
                 sys.path.insert(0, root)
             return candidate
-    raise RuntimeError("Could not find the Forge repo root.")
+    raise RuntimeError("Could not find the Forged Machine Monitoring repo root.")

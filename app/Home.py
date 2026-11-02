@@ -11,10 +11,11 @@ from app.bootstrap import install
 install(Path(__file__))
 
 from app import db  # noqa: E402
-from app.ui import chart_layout, header, inject  # noqa: E402
+from app.ui import chart_layout, header, inject, render_shift_plan  # noqa: E402
+from models.shift_plan import plan_shift  # noqa: E402
 from config import CLOCK_MAX, CLOCK_MIN  # noqa: E402
 
-st.set_page_config(page_title="Forge — Fleet", page_icon="⚙", layout="wide")
+st.set_page_config(page_title="Forged Machine Monitoring — Fleet", page_icon="⚙", layout="wide")
 inject()
 
 
@@ -76,6 +77,9 @@ def main() -> None:
         "On this synthetic plant the calibrated score usually sits near 0 or near 1, so amber is rare. "
         "Line and production impact are SIMULATED. Part alerts are SIMULATED stock."
     )
+
+    st.subheader("This shift")
+    render_shift_plan(plan_shift(fleet, db.technicians(con), clock))
 
     history = db.morning_history(con, clock)
     left, right = st.columns([1.5, 1])

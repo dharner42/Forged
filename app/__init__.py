@@ -1,1 +1,1 @@
-"""Forge Streamlit dashboard."""
+"""Forged Machine Monitoring dashboard."""

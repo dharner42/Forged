@@ -1,4 +1,4 @@
-# How to defend Forge
+# How to defend Forged Machine Monitoring
 
 This is the plain-language version of the design. Read it out loud once. The numbers below are from the training run recorded in `results/results.md`. If you retrain, read that file again and update the three numbers you memorize: the 24-hour F1, the remaining-life RMSE, and the AI4I F1.
 
@@ -6,7 +6,7 @@ You do not need to pretend you wrote every line. You do need to be able to open 
 
 ## The one-minute version
 
-A maintenance lead at a 20 to 500 person plant starts the shift with more machines than people. Forge ranks what to fix first. It uses a real failure model on a public machine dataset, then multiplies that risk by how much production the machine stops and by whether the part is on the shelf.
+A maintenance lead at a 20 to 500 person plant starts the shift with more machines than people. Forged Machine Monitoring ranks what to fix first. It uses a real failure model on a public machine dataset, then multiplies that risk by how much production the machine stops and by whether the part is on the shelf.
 
 Three models, no language model:
 
@@ -113,6 +113,12 @@ This is not a fourth machine-learning model. It is a business weight. On the bac
 
 The queue then applies a shop rule the backtest does not use. If any component was replaced in the last 24 hours, the queue score is 15% of the formula (`× 0.15`). Marking a machine repaired writes that replacement at the plant clock, rescores, and the machine drops. The probability stays on the page. You are not hiding the model. You are not sending a second technician to a machine someone just finished. Say that distinction. If you blur it, a sharp interviewer will think you cooked the backtest.
 
+## This shift is a constraint, not a new model
+
+On the demo morning the ranked list puts machine 19 first, at 7.50. The shift plan says do not start it. It is 06:00, so the day shift is on duty. Comp4 takes a general technician, and the only general technician works swing. Comp4 is also at zero on the shelf, with a 21-day lead time. The jobs that can start are machine 61 (E. Shah, hydraulics, one part left) and machine 77 (A. Rivera, mechanical).
+
+Each person on duty can take one machine. A second job for the same skill waits. The code is `models/shift_plan.py`. The September–December backtest still ranks by the formula alone. If they ask why the top machine is not the one you work, that is the answer: priority says what hurts most, the shift plan says what this crew can touch before the part arrives.
+
 ## Why the 0.99 is not the boast
 
 The Azure file was built so that failures leave a loud fingerprint in the sensors and the errors. A tree model can almost draw a box around them. The logistic regression is already good, which tells you the signal is simple. The component guess is essentially perfect for the same reason: the simulator's rule for "which component" is recoverable from the same features.
@@ -180,6 +186,7 @@ Use one of these if they ask for a scar.
 | `models/rul.py` | Engines, the cap at 125, why cycle number is absent. |
 | `models/ai4i.py` | F1, the baseline, why RNF is not a target. |
 | `models/priority.py` | The formula and the 24-hour shop rule. |
+| `models/shift_plan.py` | Who is on duty, and which red machines cannot be started. |
 | `models/score.py` | How a morning list is scored and how the backtest is counted. |
 | `app/Home.py` | The screen a lead sees first. |
 | `results/results.md` | The numbers. Do not recite from memory if this file is in front of you. |
