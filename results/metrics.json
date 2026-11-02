@@ -211,7 +211,24 @@
     "service_suppression": 0.15,
     "ranked_by": "priority_score (the published formula, not the 24-hour service rule)",
     "sentence": "On 115 mornings from September through late December, the priority formula's top 10 had an average of 2.49 machines that failed within 7 days, versus 1.50 for oldest-machine-first, 2.49 for failure probability alone, and 1.25 for a random 10 machines.",
-    "demo_as_of": "2015-11-23 06:00:00"
+    "demo_as_of": "2015-11-23 06:00:00",
+    "savings": {
+      "method": "reference_machine",
+      "reference_impact": 3,
+      "reference_component": "comp2",
+      "reference_parts_short": false,
+      "usd_per_extra_catch": 4837.5,
+      "extra_catches_per_morning_vs_oldest": 0.9826086956521738,
+      "extra_catches_per_morning_vs_random": 1.2321739130434781,
+      "usd_per_morning_vs_oldest": 4753.37,
+      "usd_per_morning_vs_random": 5960.64,
+      "usd_window_vs_oldest": 546637.5,
+      "usd_window_vs_random": 685473.75,
+      "mornings": 115,
+      "list_size": 10,
+      "assumptions_file": "cost_assumptions.py",
+      "note": "Over 115 mornings, the rates in cost_assumptions.py applied to one reference machine (impact 3, comp2, part in stock) price the priority list at $546,638 versus oldest-machine-first and $685,474 versus a random 10. One extra catch on that machine is $4,838: the unplanned stop, plus the inspection the list slot no longer wastes, minus the planned repair. The stored backtest keeps average hits, not the machine ids, so this edition does not use each machine's own impact. Impact, stock, and these rates are assumptions, not a supplier's invoices. `make train` replaces this with the sum over the actual machines on each morning."
+    }
   },
   "bands": {
     "red_at": 1.0,

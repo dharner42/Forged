@@ -62,4 +62,17 @@ On 115 mornings from September through late December, the priority formula's top
 
 The ranking in that sentence is the published formula, priority = probability × impact × parts factor. It does not use the 24-hour "just serviced" queue adjustment. Parts and impact are simulated, so this is a test of the weighting scheme on the synthetic plant, not of a real storeroom.
 
+## What the priority list is worth, in the planning rates
+
+Assumptions live in `cost_assumptions.py` and nowhere else. Downtime is priced by production impact. A missed failure costs unplanned downtime, emergency labor, and the part. A failure caught on the list costs a shorter planned stop, straight-time labor, and the same part, with the expedite multiplier when that component is out of stock or below its reorder point. A list slot spent on a machine that does not fail costs a short inspection. The backtest list length is fixed, so the strategies are compared on the same number of jobs.
+
+This edition prices the published hit-rate gap on one reference machine: impact 3, comp2, part in stock. One extra catch on that machine is $4,838.
+
+| Comparison | Extra catches per morning | USD per morning | USD over the window |
+| --- | ---: | ---: | ---: |
+| Versus oldest-machine-first | 0.98 | $4,753 | $546,638 |
+| Versus a random 10 | 1.23 | $5,961 | $685,474 |
+
+Over 115 mornings, the rates in cost_assumptions.py applied to one reference machine (impact 3, comp2, part in stock) price the priority list at $546,638 versus oldest-machine-first and $685,474 versus a random 10. One extra catch on that machine is $4,838: the unplanned stop, plus the inspection the list slot no longer wastes, minus the planned repair. The stored backtest keeps average hits, not the machine ids, so this edition does not use each machine's own impact. Impact, stock, and these rates are assumptions, not a supplier's invoices. `make train` replaces this with the sum over the actual machines on each morning.
+
 Demo plant clock: 2015-11-23 06:00:00. That morning is the November Monday whose priority scores are most spread out, and at least one machine is out of the green band when such a Monday exists. It was not chosen by looking at which machine failed later.
