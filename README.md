@@ -92,7 +92,7 @@ The public app is [forged.streamlit.app](https://forged.streamlit.app/). Two way
 | Requirements | `requirements.txt` |
 | Python | 3.12 (`runtime.txt` and `.python-version`) |
 
-No secrets. The first page load builds a 12-machine sample warehouse in the app's filesystem, so the deploy does not download Azure, NASA, or AI4I and does not need the trained-model rescore path. The published RMSE, the 2.49 backtest, and the dollar figures still come from `results/`, and the banner says the 12 machines are not that run.
+No secrets. Python must be 3.12: `numpy` and `xgboost` in `requirements.txt` will not install on an older interpreter. The first page load builds a 12-machine sample warehouse in the app's filesystem, so the deploy does not download Azure, NASA, or AI4I and does not need the trained-model rescore path. The published RMSE, the 2.49 backtest, and the dollar figures still come from `results/`, and the banner says the 12 machines are not that run. `.streamlit/config.toml` must not set `server.port`. Community Cloud expects 8501. The local dashboard still uses 8741 because `make dashboard` passes that port on the command line.
 
 **Docker.** From the repo root:
 

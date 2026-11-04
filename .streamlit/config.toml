@@ -1,7 +1,10 @@
+# Do not set server.port or server.address in this file.
+# Streamlit Community Cloud routes to port 8501. A different port makes the
+# platform report "application is down" and the deploy never becomes healthy.
+# Local `make dashboard` still uses port 8741, passed on the command line.
+
 [server]
 headless = true
-address = "0.0.0.0"
-port = 8741
 fileWatcherType = "none"
 
 [browser]
