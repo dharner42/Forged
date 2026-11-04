@@ -6,7 +6,7 @@ You do not need to pretend you wrote every line. You do need to be able to open 
 
 ## The one-minute version
 
-A maintenance lead at a 20 to 500 person plant starts the shift with more machines than people. Forged Machine Monitoring ranks what to fix first. It uses a real failure model on a public machine dataset, then multiplies that risk by how much production the machine stops and by whether the part is on the shelf.
+A maintenance lead at a 20 to 500 person plant starts the shift with more machines than people. Forged Machine Monitoring ranks what to fix first. It uses a real failure model on a public machine dataset, then multiplies that risk by how much production the machine stops and by whether the part is on the shelf. The public screen is [forged.streamlit.app](https://forged.streamlit.app/). That deploy is the 12-machine sample, not the 100-machine Azure warehouse.
 
 Three models, no language model:
 

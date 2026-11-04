@@ -22,10 +22,11 @@ The plant on the dashboard, once you run `make pipeline` and `make train`, is th
 
 ## Live demo
 
-Not deployed yet. The app is ready for Streamlit Community Cloud. The steps are under [Deploy](#deploy).
+The app is deployed: [forged.streamlit.app](https://forged.streamlit.app/).
 
-- Demo: `https://<app-name>.streamlit.app` — placeholder. Replace this after you deploy.
-- Loom walkthrough: `https://www.loom.com/share/<recording-id>` — placeholder. Record a five-minute pass of the fleet, one machine, the queue, and the parts page.
+That URL opens the 12-machine sample. Machine 4 is the worked example (priority 7.50). The published RMSE, the 2.49 backtest, and the dollar figures are from `results/` on the full files, and the page says so. How it was deployed is under [Deploy](#deploy).
+
+- Loom walkthrough: `https://www.loom.com/share/<recording-id>` — not recorded yet. Record a five-minute pass of the fleet, one machine, the queue, and the parts page, then replace this link.
 
 ## Who it is for
 
@@ -81,9 +82,9 @@ The dashboard listens on port **8741** ([http://127.0.0.1:8741](http://127.0.0.1
 
 ## Deploy
 
-I have not deployed this. Two ways to run it for someone who will not clone the repo:
+The public app is [forged.streamlit.app](https://forged.streamlit.app/). Two ways to run it yourself:
 
-**Streamlit Community Cloud.** Push the repo to a public GitHub account, then at [share.streamlit.io](https://share.streamlit.io/) create an app with:
+**Streamlit Community Cloud.** The deployed app was created at [share.streamlit.io](https://share.streamlit.io/) with:
 
 | Setting | Value |
 | --- | --- |
@@ -91,7 +92,7 @@ I have not deployed this. Two ways to run it for someone who will not clone the 
 | Requirements | `requirements.txt` |
 | Python | 3.12 (`runtime.txt` and `.python-version`) |
 
-No secrets. The first page load builds a 12-machine sample warehouse in the app's filesystem, so the deploy does not download Azure, NASA, or AI4I and does not need the trained-model rescore path. The published RMSE, the 2.49 backtest, and the dollar figures still come from `results/`, and the banner says the 12 machines are not that run. After it is up, replace the demo placeholder above with the real `*.streamlit.app` URL.
+No secrets. Python must be 3.12: `numpy` and `xgboost` in `requirements.txt` will not install on an older interpreter. The first page load builds a 12-machine sample warehouse in the app's filesystem, so the deploy does not download Azure, NASA, or AI4I and does not need the trained-model rescore path. The published RMSE, the 2.49 backtest, and the dollar figures still come from `results/`, and the banner says the 12 machines are not that run. `.streamlit/config.toml` must not set `server.port`. Community Cloud expects 8501. The local dashboard still uses 8741 because `make dashboard` passes that port on the command line.
 
 **Docker.** From the repo root:
 
@@ -102,7 +103,7 @@ docker run --rm -p 8741:8741 forged
 
 Open [http://127.0.0.1:8741](http://127.0.0.1:8741). Same sample plant on first start. The image does not contain `data/raw/`.
 
-A Loom walkthrough is still a manual recording. Leave the link above as a placeholder until that file exists.
+A Loom walkthrough is still a manual recording. The link at the top of this file stays a placeholder until that recording exists.
 
 Training the remaining-life grid search takes a few minutes. The Azure feature table is about two seconds. Expect the full `make train` to take roughly five to eight minutes on a 4-core machine.
 
@@ -286,5 +287,5 @@ Dockerfile           the same app, sample plant on first start
 - RNF is not a target. FD002–FD004 are not loaded.
 - The queue multiplies by 0.15 for 24 hours after a replacement. The published formula and the backtest do not.
 - No discovery-call notes and no fellowship essay. Those are not software.
-- The app is ready for Streamlit Community Cloud and for Docker. It is not deployed. The demo URL and the Loom link in this file are placeholders until the owner deploys and records them. Secrets, if a later host needs them, go in the host's secret store, not in git.
+- The public app is [forged.streamlit.app](https://forged.streamlit.app/). The Loom link in this file is still a placeholder until that recording exists. Secrets, if a later host needs them, go in the host's secret store, not in git.
 - The published dollar figures price the stored hit-rate gap on one reference machine. The training path prices the actual machines on each morning and rewrites `results/` when you run `make train`.
