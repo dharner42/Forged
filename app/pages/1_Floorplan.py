@@ -1,18 +1,19 @@
 """Shop floor: machines laid out by line, colored by band."""
 
+import sys
 from pathlib import Path
+
+_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "config.py").exists())
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from app.bootstrap import install
-
-install(Path(__file__))
-
-from app import db  # noqa: E402
-from app.ui import chart_layout, header, inject, sample_banner  # noqa: E402
-from pipeline.seed_ops import LINES  # noqa: E402
+from app import db
+from app.ui import chart_layout, header, inject, sample_banner
+from pipeline.seed_ops import LINES
 
 st.set_page_config(page_title="Forged Machine Monitoring — Floorplan", page_icon="⚙", layout="wide")
 inject()

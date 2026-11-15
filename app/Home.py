@@ -1,21 +1,22 @@
 """Fleet readiness: the shift lead's first screen."""
 
+import sys
 from pathlib import Path
+
+_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "config.py").exists())
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from app.bootstrap import install
-
-install(Path(__file__))
-
-from app import db  # noqa: E402
-from app.ui import chart_layout, header, inject, render_shift_plan, sample_banner  # noqa: E402
-from models.costs import savings_from_hit_rates  # noqa: E402
-from models.shift_plan import plan_shift  # noqa: E402
-from config import CLOCK_MAX, CLOCK_MIN  # noqa: E402
-from pipeline.sample_plant import SAMPLE_CLOCK, sample_history_start  # noqa: E402
+from app import db
+from app.ui import chart_layout, header, inject, render_shift_plan, sample_banner
+from models.costs import savings_from_hit_rates
+from models.shift_plan import plan_shift
+from config import CLOCK_MAX, CLOCK_MIN
+from pipeline.sample_plant import SAMPLE_CLOCK, sample_history_start
 
 st.set_page_config(page_title="Forged Machine Monitoring — Fleet", page_icon="⚙", layout="wide")
 inject()

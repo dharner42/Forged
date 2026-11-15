@@ -1,17 +1,18 @@
 """The full ranked work queue and the open work orders."""
 
+import sys
 from pathlib import Path
+
+_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "config.py").exists())
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import streamlit as st
 
-from app.bootstrap import install
-
-install(Path(__file__))
-
-from app import db  # noqa: E402
-from app.ui import header, inject, render_shift_plan, sample_banner  # noqa: E402
-from models.costs import savings_from_hit_rates  # noqa: E402
-from models.shift_plan import plan_shift  # noqa: E402
+from app import db
+from app.ui import header, inject, render_shift_plan, sample_banner
+from models.costs import savings_from_hit_rates
+from models.shift_plan import plan_shift
 
 st.set_page_config(page_title="Forged Machine Monitoring — Work queue", page_icon="⚙", layout="wide")
 inject()
