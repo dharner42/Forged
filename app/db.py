@@ -3,19 +3,14 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-from app.bootstrap import install
-
-install(Path(__file__))
-
-from config import DB_PATH, METRICS_PATH  # noqa: E402
-from models.shift_plan import shift_name  # noqa: E402
-from pipeline.seed_ops import pick_technician  # noqa: E402
-from pipeline.warehouse import connect, read_clock  # noqa: E402
+from config import DB_PATH, METRICS_PATH
+from models.shift_plan import shift_name
+from pipeline.seed_ops import pick_technician
+from pipeline.warehouse import connect, read_clock
 
 
 def connection():

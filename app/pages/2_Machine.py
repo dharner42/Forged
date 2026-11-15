@@ -1,20 +1,21 @@
 """One machine: sensors, why it ranks, parts, and the work order."""
 
 import json
+import sys
 from pathlib import Path
+
+_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "config.py").exists())
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
-from app.bootstrap import install
-
-install(Path(__file__))
-
-from app import db  # noqa: E402
-from app.ui import band_html, chart_layout, header, inject, sample_banner  # noqa: E402
-from models.shift_plan import plan_shift  # noqa: E402
+from app import db
+from app.ui import band_html, chart_layout, header, inject, sample_banner
+from models.shift_plan import plan_shift
 
 st.set_page_config(page_title="Forged Machine Monitoring — Machine", page_icon="⚙", layout="wide")
 inject()
